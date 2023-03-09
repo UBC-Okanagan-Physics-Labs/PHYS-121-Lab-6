@@ -7,6 +7,7 @@ Created on Tue May 24 21:19:19 2022
 
 # Import some required modules.
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import random
 import os
@@ -280,7 +281,8 @@ def MultiScatter(DataArray, xlabel = 'x-axis', ylabel = 'y-axis', xUnits = '', y
             if len(DataArray[i]) != 2 and len(DataArray[i]) != 3:
                 display(html_print(cstr("The elements of 'DataArray' must be lists of length 2 or 3.  Element " + str(i + 1) + ' does not satisfy this requirement.', color = 'magenta')))
                 return fig
-            elif all(isinstance(x, list) or type(x).__module__ == np.__name__ for x in DataArray[i]) != True: # Is dataArray a list of lists or arrays?
+            
+            elif all(isinstance(x, (list, pd.core.series.Series)) or type(x).__module__ == np.__name__ for x in DataArray[i]) != True: # Is dataArray a list of lists or arrays
                 display(html_print(cstr("The elements of 'DataArray' must be a list of lists.  Element " +  str(i + 1) + ' does not satisfy this requirement.', color = 'magenta')))
                 return fig
             elif len(DataArray[i]) == 2:
@@ -297,7 +299,7 @@ def MultiScatter(DataArray, xlabel = 'x-axis', ylabel = 'y-axis', xUnits = '', y
             if type(DataArray[i]).__module__ == np.__name__:
                 DataArray[i] = DataArray[i].tolist()
             for j in range(len(DataArray[i])):
-                if type(DataArray[i][j]).__module__ == np.__name__:
+                if type(DataArray[i][j]).__module__ == np.__name__ or isinstance(DataArray[i][j], pd.core.series.Series):
                     DataArray[i][j] = DataArray[i][j].tolist()
         # Convert DataArray to a single master list
         masterList = sum(sum(DataArray,[]),[])
@@ -314,7 +316,7 @@ def MultiScatter(DataArray, xlabel = 'x-axis', ylabel = 'y-axis', xUnits = '', y
             if len(DataArray[i]) == 2:
                 # plot without error bars
                 plt.plot(DataArray[i][0], DataArray[i][1], 'o', color = 'k', markersize = 6,\
-                        markeredgecolor = 'b',\
+                        markeredgecolor = c,\
                         markerfacecolor = c)
             elif len(DataArray[i]) == 3:
                 # plot with error bars
